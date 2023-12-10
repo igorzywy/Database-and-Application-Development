@@ -1,0 +1,99 @@
+/*mailinglist.txt*/ 
+
+SELECT * FROM account
+ORDER BY branchNumber;
+
+/*branchreport.txt*/
+
+SELECT t.transactionId,sa.salesAssistantId,b.branchNumber,
+a.accountNo,s.supplierName,p.price,tl.quantity,tl.quantity * p.price AS 'Total'
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+INNER JOIN sales_assistant AS sa ON sa.salesAssistantId = t.salesAssistantId
+INNER JOIN branch AS b ON b.branchNumber = t.branchNumber
+INNER JOIN account AS a ON a.accountNo = t.accountNo
+INNER JOIN supplier AS s ON s.supplierName = p.supplierName
+WHERE t.date = '2012-06-08';
+
+/*accountreport.txt*/
+
+SELECT a.accountNo,t.transactionId,sa.salesAssistantId,b.branchNumber,p.price,tl.quantity,p.price * tl.quantity AS 'Total'
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+INNER JOIN sales_assistant AS sa ON sa.salesAssistantId = t.salesAssistantId
+INNER JOIN branch AS b ON b.branchNumber = t.branchNumber
+INNER JOIN account AS a ON a.accountNo = t.accountNo
+WHERE a.accountNo = '5';
+
+/*salespersonPerformance.txt*/
+
+SELECT sa.aLastName,sa.salesAssistantId,a.accountNo,t.transactionId,p.price,tl.quantity,t.date,t.time,p.price * tl.quantity AS 'Total'
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+INNER JOIN sales_assistant AS sa ON sa.salesAssistantId = t.salesAssistantId
+INNER JOIN branch AS b ON b.branchNumber = t.branchNumber
+INNER JOIN account AS a ON a.accountNo = t.accountNo
+WHERE sa.aLastName = 'Hurley'
+ORDER BY t.date,t.time;
+
+/*productsales.txt*/
+
+SELECT p.productCode,p.productName,tl.quantity,t.transactionId,t.date
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+WHERE p.productCode = '4'
+ORDER BY t.date;
+
+/*bestStore.txt*/
+
+SELECT t.transactionId,t.branchNumber,COUNT(*) AS branch_tot,t.date
+FROM transaction AS t
+WHERE t.date = '2018-03-08'
+GROUP BY t.branchNumber
+ORDER BY branch_tot DESC
+LIMIT 1;
+
+/*bestNewProduct.txt*/
+
+SELECT p.productCode,p.productName,t.branchNumber,COUNT(*) AS items_sold
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+WHERE p.productCode = '1'
+GROUP BY t.branchNumber
+ORDER BY items_sold DESC
+LIMIT 1;
+
+/*inactive.txt*/
+
+SELECT t.accountNo,MAX(t.date)
+FROM transaction AS t
+WHERE t.date < '2018-01-11'
+GROUP BY t.accountNo;
+
+/*5ormore.txt*/
+
+SELECT t.accountNo,COUNT(*) AS total_transactions
+FROM transaction AS t
+WHERE t.date < '2018-01-11' 
+GROUP BY t.accountNo
+HAVING total_transactions >= '5';
+
+/*bonus.txt*/
+
+SELECT t.salesAssistantId,SUM(tl.quantity * p.price) AS 'Total'
+FROM transaction AS t
+INNER JOIN transaction_line AS tl ON t.transactionId = tl.transactionId
+INNER JOIN product AS p ON p.productCode = tl.productCode
+GROUP BY t.salesAssistantId
+HAVING Total >= '1000';
+
+/*update.txt*/
+
+UPDATE product
+SET price = price * 0.9
+WHERE productType = 'Mobile';

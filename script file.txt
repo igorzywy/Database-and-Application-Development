@@ -1,0 +1,92 @@
+create database assignment;
+show databases;
+use assignment;
+create table branch
+(
+branchNumber int NOT NULL AUTO_INCREMENT,
+address1 varchar(50) NOT NULL,
+city varchar(50) NOT NULL,
+postcode char(30) NOT NULL,
+telephoneNumber varchar(50) NOT NULL,
+PRIMARY KEY (branchNumber)
+);
+create table sales_assistant
+(
+salesAssistantId int NOT NULL AUTO_INCREMENT,
+branchNumber int NOT NULL,
+aFirstName varchar(15) NOT NULL,
+aLastName varchar(15) NOT NULL,
+PRIMARY KEY (salesAssistantId),
+FOREIGN KEY (branchNumber) REFERENCES branch(branchNumber)
+);
+create table account
+(
+accountNo int NOT NULL AUTO_INCREMENT,
+branchNumber int NOT NULL,
+custFirstName varchar(15) NOT NULL,
+custLastName varchar(15) NOT NULL,
+address1 varchar(50) NOT NULL,
+city varchar(50) NOT NULL,
+postcode char(30) NOT NULL,
+DOB date NOT NULL,
+telephoneNumber varchar(50) NOT NULL,
+email varchar(40),
+PRIMARY KEY (accountNo),
+FOREIGN KEY (branchNumber) REFERENCES branch(branchNumber)
+);
+create table shipping_company
+(
+companyName varchar(20) NOT NULL,
+address1 varchar(50) NOT NULL,
+city varchar(50) NOT NULL,
+postcode char(30) NOT NULL,
+email varchar(40) NOT NULL,
+contactNumber varchar(50) NOT NULL,
+PRIMARY KEY (companyName)
+);
+create table transaction
+(
+transactionId int NOT NULL AUTO_INCREMENT,
+branchNumber int NOT NULL,
+accountNo int NOT NULL,
+salesAssistantId int NOT NULL,
+companyName varchar(20) NOT NULL,
+time time NOT NULL,
+date date NOT NULL,
+PRIMARY KEY (transactionId),
+FOREIGN KEY (branchNumber) REFERENCES branch(branchNumber),
+FOREIGN KEY (accountNo) REFERENCES account(accountNo),
+FOREIGN KEY (salesAssistantId) REFERENCES sales_assistant(salesAssistantId),
+FOREIGN KEY (companyName) REFERENCES shipping_company(companyName)
+);
+create table supplier
+(
+supplierName varchar(20) NOT NULL,
+address1 varchar(50) NOT NULL,
+city varchar(50) NOT NULL,
+postcode char(30) NOT NULL,
+cFirstName varchar(20) NOT NULL,
+cLastName varchar(20) NOT NULL,
+telephoneNumbers varchar(50) NOT NULL,
+email varchar(40) NOT NULL,
+PRIMARY KEY (supplierName)
+);
+create table product
+(
+productCode int NOT NULL AUTO_INCREMENT,
+supplierName varchar(20) NOT NULL,
+productName varchar(15) NOT NULL,
+productType varchar(15) NOT NULL,
+price decimal(10,2) NOT NULL,
+PRIMARY KEY (productCode),
+FOREIGN KEY (supplierName) REFERENCES supplier(supplierName)
+);
+create table transaction_line
+(
+transactionId int NOT NULL,
+productCode int NOT NULL,
+quantity int NOT NULL,
+PRIMARY KEY (transactionId, productCode),
+FOREIGN KEY (transactionId) REFERENCES transaction(transactionId),
+FOREIGN KEY (productCode) REFERENCES product(productCode)
+);
